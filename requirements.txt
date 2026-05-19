@@ -4,3 +4,4 @@ opencv-python-headless==4.10.0.84
 streamlit==1.40.1
 Pillow
 numpy<2.0.0
+lapx
