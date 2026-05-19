@@ -1,0 +1,19 @@
+# Environments
+venv/
+env/
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Mac OS
+.DS_Store
+
+# YOLO/Ultralytics caches
+runs/
+*.pt
+
+# Streamlit
+.streamlit/
