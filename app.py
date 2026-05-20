@@ -63,20 +63,21 @@ elif input_type == "IP Camera (Phone)":
 # 2. Vehicle Types
 target_classes = st.sidebar.multiselect(
     "Select vehicles to count",
-    ['car', 'motorcycle', 'bus', 'truck'],
-    default=['car', 'motorcycle']
+    ['person', 'bicycle', 'car', 'motorcycle', 'bus', 'truck'],
+    default=['car', 'motorcycle', 'bus', 'truck']
 )
 
 # 3. Virtual Line Position
 line_position = st.sidebar.slider("Virtual Line Vertical Position (%)", 10, 90, 50)
 
-# Initialize tracker (only once to load model efficiently)
-@st.cache_resource
-def get_tracker():
-    return VehicleTracker()
+# Initialize model efficiently
+from ultralytics import YOLO
 
-tracker = get_tracker()
-tracker.set_target_classes(target_classes)
+@st.cache_resource
+def get_model():
+    return YOLO('yolov8s.pt') # Use 's' model to guarantee detection of Car 4
+
+model = get_model()
 
 class VideoStream:
     """Threaded video capture to always get the latest frame and prevent buffer lag."""
@@ -130,6 +131,10 @@ if start_button:
     if video_path is None or (input_type == "IP Camera (Phone)" and video_path == "http://192.168.1.xxx:8080/video"):
         st.warning("Please provide a valid video source.")
     else:
+        # Create a fresh tracker instance for the new video run
+        tracker = VehicleTracker(model)
+        tracker.set_target_classes(target_classes)
+        
         # Use threaded reader for IP Camera to avoid lag, standard for files
         is_live_stream = input_type == "IP Camera (Phone)"
         if is_live_stream:
